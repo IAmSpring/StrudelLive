@@ -79,11 +79,11 @@ export function ChatPanel({ projectId }: ChatPanelProps) {
         <div className="space-y-4">
           {messages.length === 0 && (
             <div className="text-center py-8">
-              <div className="w-12 h-12 bg-strudel-primary rounded-full flex items-center justify-center mx-auto mb-3">
-                <i className="fas fa-robot text-white"></i>
+              <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span className="text-white font-mono text-lg">AI</span>
               </div>
-              <p className="text-slate-300 text-sm mb-1">AI Assistant Ready</p>
-              <p className="text-slate-500 text-xs">Ask me anything about Strudel patterns, samples, or performance tips!</p>
+              <p className="text-green-300 text-sm mb-1 font-mono">STRUDEL AI READY</p>
+              <p className="text-green-500 text-xs font-mono">Ask about patterns, samples, or performance tips</p>
             </div>
           )}
           
@@ -96,20 +96,22 @@ export function ChatPanel({ projectId }: ChatPanelProps) {
             >
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 msg.role === "user" 
-                  ? "bg-strudel-accent" 
-                  : "bg-strudel-primary"
+                  ? "bg-orange-600" 
+                  : "bg-green-600"
               }`}>
-                <i className={`fas ${msg.role === "user" ? "fa-user" : "fa-robot"} text-white text-sm`}></i>
+                <span className="text-white text-sm font-mono">
+                  {msg.role === "user" ? "U" : "AI"}
+                </span>
               </div>
               <div className="flex-1">
-                <div className={`rounded-lg p-3 ${
+                <div className={`rounded-lg p-3 font-mono text-sm ${
                   msg.role === "user"
-                    ? "bg-strudel-accent/20 border border-strudel-accent/30"
-                    : "bg-strudel-surface-light"
+                    ? "bg-orange-900/20 border border-orange-700/30 text-orange-200"
+                    : "bg-green-900/20 border border-green-700/30 text-green-200"
                 }`}>
-                  <p className="text-sm text-slate-200 whitespace-pre-wrap">{msg.content}</p>
+                  <p className="whitespace-pre-wrap">{msg.content}</p>
                 </div>
-                <span className="text-xs text-slate-500 mt-1 block">
+                <span className="text-xs text-cyan-500 mt-1 block font-mono">
                   {formatTimestamp(msg.createdAt!)}
                 </span>
               </div>
@@ -144,19 +146,19 @@ export function ChatPanel({ projectId }: ChatPanelProps) {
       <div className="p-4 border-t border-strudel-surface-light">
         <div className="flex space-x-2">
           <Input
-            placeholder="Ask me anything about Strudel..."
+            placeholder="Ask about Strudel patterns..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={sendMessageMutation.isPending}
-            className="flex-1 bg-strudel-surface-light border-strudel-surface-light text-slate-200 placeholder-slate-400 focus:ring-strudel-primary focus:border-transparent"
+            className="flex-1 bg-black/50 border-cyan-700 text-cyan-200 placeholder-cyan-500 focus:ring-cyan-400 focus:border-cyan-400 font-mono text-sm"
           />
           <Button
             onClick={handleSendMessage}
             disabled={!message.trim() || sendMessageMutation.isPending}
-            className="bg-strudel-primary hover:bg-strudel-primary/80 text-white"
+            className="bg-green-600 hover:bg-green-700 text-white font-mono text-sm"
           >
-            <i className="fas fa-paper-plane"></i>
+            SEND
           </Button>
         </div>
       </div>

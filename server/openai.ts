@@ -80,7 +80,7 @@ async function chatWithAssistant(userMessage: string, currentCode?: string): Pro
     
     // Add the user message with current code context
     const messageContent = currentCode 
-      ? `Current Strudel code:\n\`\`\`\n${currentCode}\n\`\`\`\n\n${userMessage}`
+      ? `Current Strudel code:\n\`\`\`strudel\n${currentCode}\n\`\`\`\n\n${userMessage}`
       : userMessage;
     
     await openai.beta.threads.messages.create(thread.id, {
@@ -88,9 +88,18 @@ async function chatWithAssistant(userMessage: string, currentCode?: string): Pro
       content: messageContent
     });
 
-    // Run the assistant
+    // Run the assistant with additional instructions
     const run = await openai.beta.threads.runs.create(thread.id, {
-      assistant_id: STRUDEL_ASSISTANT_ID!
+      assistant_id: STRUDEL_ASSISTANT_ID!,
+      additional_instructions: `You are a StrudelLive AI Assistant with comprehensive Strudel documentation. Help users create expressive algorithmic music with expert knowledge of:
+
+- Strudel syntax: s("bd sd hh"), note("c e g"), n("0 2 4").scale("C:minor")
+- Mini-notation: "bd*4" (repeat), "[bd sd]*2" (groups), "<bd sd>" (alternate)
+- Effects: .lpf(800) .room(.3) .delay(.125) .gain(.7)
+- Pattern functions: .rev() .jux() .sometimes() .often()
+- Live coding techniques and performance tips
+
+Provide practical, musical advice. Include working Strudel code examples when helpful. Focus on live performance and creative expression.`
     });
 
     // Wait for completion
