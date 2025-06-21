@@ -1,0 +1,398 @@
+{
+  "name": "StrudelLive AI Assistant Functions",
+  "description": "Complete function schema for OpenAI Assistant to control the Strudel live coding platform through browser API calls",
+  "functions": [
+    {
+      "name": "evaluate_strudel_code",
+      "description": "Evaluate and play Strudel pattern code in the browser audio engine",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Valid Strudel pattern code to evaluate and play. Use proper Strudel syntax: s(\"bd sd hh\"), note(\"c e g\"), effects like .lpf(800).room(.3), etc."
+          }
+        },
+        "required": ["code"]
+      }
+    },
+    {
+      "name": "start_audio_playback",
+      "description": "Start audio playback in the browser",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "stop_audio_playback",
+      "description": "Stop audio playback in the browser",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "set_master_volume",
+      "description": "Set the master volume level of the audio engine",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "volume": {
+            "type": "number",
+            "description": "Volume level between 0.0 (silent) and 1.0 (maximum)",
+            "minimum": 0.0,
+            "maximum": 1.0
+          }
+        },
+        "required": ["volume"]
+      }
+    },
+    {
+      "name": "create_new_project",
+      "description": "Create a new Strudel project with given parameters",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name for the new project"
+          },
+          "code": {
+            "type": "string",
+            "description": "Initial Strudel code for the project (optional)"
+          },
+          "bpm": {
+            "type": "integer",
+            "description": "Beats per minute for the project",
+            "default": 120,
+            "minimum": 60,
+            "maximum": 200
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "Whether the project should be public",
+            "default": false
+          }
+        },
+        "required": ["name"]
+      }
+    },
+    {
+      "name": "update_project_code",
+      "description": "Update the code of an existing project",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "integer",
+            "description": "ID of the project to update"
+          },
+          "code": {
+            "type": "string",
+            "description": "New Strudel code for the project"
+          }
+        },
+        "required": ["projectId", "code"]
+      }
+    },
+    {
+      "name": "load_project",
+      "description": "Load a specific project into the editor",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "integer",
+            "description": "ID of the project to load"
+          }
+        },
+        "required": ["projectId"]
+      }
+    },
+    {
+      "name": "save_project_snapshot",
+      "description": "Save a snapshot/version of the current project state",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "integer",
+            "description": "ID of the project"
+          },
+          "message": {
+            "type": "string",
+            "description": "Description or message for this snapshot"
+          }
+        },
+        "required": ["projectId", "message"]
+      }
+    },
+    {
+      "name": "generate_random_pattern",
+      "description": "Generate a random Strudel beat pattern using AI",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "style": {
+            "type": "string",
+            "description": "Style or genre for the pattern (e.g., 'techno', 'house', 'ambient', 'breakbeat')",
+            "default": "general"
+          },
+          "bpm": {
+            "type": "integer",
+            "description": "BPM for the generated pattern",
+            "default": 120,
+            "minimum": 60,
+            "maximum": 200
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "generate_specific_pattern",
+      "description": "Generate a specific Strudel pattern based on detailed description",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Detailed description of the desired pattern (e.g., 'four-on-the-floor kick with rolling hi-hats and snare on beats 2 and 4')"
+          },
+          "complexity": {
+            "type": "string",
+            "enum": ["simple", "medium", "complex"],
+            "description": "Complexity level of the pattern",
+            "default": "medium"
+          },
+          "bpm": {
+            "type": "integer",
+            "description": "BPM for the pattern",
+            "default": 120
+          }
+        },
+        "required": ["description"]
+      }
+    },
+    {
+      "name": "play_sample",
+      "description": "Play a specific audio sample for testing",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "sampleName": {
+            "type": "string",
+            "description": "Name of the sample to play (e.g., 'bd', 'sd', 'hh', 'cp', 'oh')"
+          },
+          "gain": {
+            "type": "number",
+            "description": "Volume level for the sample",
+            "default": 1.0,
+            "minimum": 0.0,
+            "maximum": 2.0
+          }
+        },
+        "required": ["sampleName"]
+      }
+    },
+    {
+      "name": "toggle_studio_mode",
+      "description": "Switch between code editor and performance studio mode",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "studioMode": {
+            "type": "boolean",
+            "description": "True for studio/performance mode, false for code editor mode"
+          }
+        },
+        "required": ["studioMode"]
+      }
+    },
+    {
+      "name": "toggle_auto_save",
+      "description": "Enable or disable automatic saving of code changes",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether to enable or disable auto-save"
+          }
+        },
+        "required": ["enabled"]
+      }
+    },
+    {
+      "name": "get_system_status",
+      "description": "Get current system status including audio engine state, CPU usage, and latency",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "show_user_notification",
+      "description": "Display a notification message to the user",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Message to display to the user"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["info", "success", "warning", "error"],
+            "description": "Type of notification",
+            "default": "info"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Duration in milliseconds to show the notification",
+            "default": 3000
+          }
+        },
+        "required": ["message"]
+      }
+    },
+    {
+      "name": "apply_global_effect",
+      "description": "Apply an audio effect to all currently playing patterns",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "effect": {
+            "type": "string",
+            "description": "Strudel effect to apply globally (e.g., 'room(.5)', 'lpf(1000)', 'gain(.7)')"
+          }
+        },
+        "required": ["effect"]
+      }
+    },
+    {
+      "name": "emergency_stop",
+      "description": "Emergency stop all audio playback (panic button)",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "get_browser_capabilities",
+      "description": "Get information about browser audio capabilities and supported features",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "export_project",
+      "description": "Export current project as audio or code file",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "format": {
+            "type": "string",
+            "enum": ["wav", "mp3", "strudel", "json"],
+            "description": "Export format"
+          },
+          "duration": {
+            "type": "number",
+            "description": "Duration in seconds for audio export",
+            "default": 30
+          }
+        },
+        "required": ["format"]
+      }
+    }
+  ],
+  "usage_examples": [
+    {
+      "scenario": "User asks for a techno beat",
+      "function_calls": [
+        {
+          "function": "generate_specific_pattern",
+          "parameters": {
+            "description": "four-on-the-floor techno beat with kick on every beat, snare on 2 and 4, rolling hi-hats",
+            "complexity": "medium",
+            "bpm": 128
+          }
+        },
+        {
+          "function": "evaluate_strudel_code", 
+          "parameters": {
+            "code": "s(\"bd*4, ~ sd ~ sd, hh*16\").bank(\"RolandTR909\").gain(.7)"
+          }
+        },
+        {
+          "function": "start_audio_playback",
+          "parameters": {}
+        }
+      ]
+    },
+    {
+      "scenario": "User wants to test a specific sample",
+      "function_calls": [
+        {
+          "function": "play_sample",
+          "parameters": {
+            "sampleName": "bd",
+            "gain": 0.8
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "User wants to save their work",
+      "function_calls": [
+        {
+          "function": "save_project_snapshot",
+          "parameters": {
+            "projectId": 1,
+            "message": "Added new bassline pattern"
+          }
+        },
+        {
+          "function": "show_user_notification",
+          "parameters": {
+            "message": "Project snapshot saved successfully!",
+            "type": "success"
+          }
+        }
+      ]
+    }
+  ],
+  "strudel_syntax_reference": {
+    "basic_sounds": "s(\"bd sd hh oh cp rim\")",
+    "notes": "note(\"c e g b\") or n(\"0 2 4 6\").scale(\"C:minor\")",
+    "mini_notation": {
+      "repeat": "bd*4 (repeat 4 times)",
+      "slow": "bd/2 (slow down by 2)", 
+      "elongate": "bd@3 (elongate by 3)",
+      "groups": "[bd sd]*2 (group and repeat)",
+      "alternate": "<bd sd> (alternate each cycle)",
+      "rest": "bd ~ sd ~ (~ for silence)",
+      "parallel": "bd*4, hh*8 (comma for layers)",
+      "euclidean": "bd(3,8) (3 hits in 8 beats)"
+    },
+    "effects": {
+      "filters": ".lpf(800) .hpf(200) .bpf(500) .lpq(10)",
+      "time": ".delay(.5) .room(.3) .pan(\"0 1\")",
+      "envelope": ".attack(.1).decay(.2).sustain(.5).release(.3)",
+      "modulation": ".lpf(sine.range(200,2000).slow(4))"
+    },
+    "pattern_functions": {
+      "transform": ".rev() .jux(rev) .fast(2) .slow(2)",
+      "conditional": ".sometimes(rev) .often(fast(2)) .rarely(add(12))",
+      "arithmetic": ".add(\"0 1\") .mul(\"1 2\") .sub(\"0 1\")",
+      "offset": ".off(1/8, x=>x.add(7))"
+    }
+  }
+}
