@@ -1,14 +1,25 @@
 import { useState } from "react";
 import { ProjectsPanel } from "./projects-panel";
 import { ChatPanel } from "./chat-panel";
+import { AIComposer } from "../ai/ai-composer";
 
 interface SidebarProps {
   currentProjectId: number | null;
   onProjectSelect: (projectId: number) => void;
   onCreateProject: (name: string) => void;
+  onCodeGenerated?: (code: string) => void;
+  onPlay?: () => void;
+  isPlaying?: boolean;
 }
 
-export function Sidebar({ currentProjectId, onProjectSelect, onCreateProject }: SidebarProps) {
+export function Sidebar({ 
+  currentProjectId, 
+  onProjectSelect, 
+  onCreateProject,
+  onCodeGenerated,
+  onPlay,
+  isPlaying = false
+}: SidebarProps) {
   const [activeTab, setActiveTab] = useState<"projects" | "chat">("projects");
   const [isStreaming] = useState(true);
 

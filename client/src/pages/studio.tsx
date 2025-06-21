@@ -14,6 +14,7 @@ import type { Project } from "@shared/schema";
 
 export default function Studio() {
   const [currentProjectId, setCurrentProjectId] = useState<number | null>(null);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [code, setCode] = useState("");
   const [isPlaying, setIsPlaying] = useState(false);
   const [rightPanelTab, setRightPanelTab] = useState<"samples" | "console">("samples");
@@ -73,6 +74,7 @@ export default function Studio() {
   useEffect(() => {
     if (currentProject) {
       setCode(currentProject.code || "");
+      setSelectedProject(currentProject);
     }
   }, [currentProject]);
 
@@ -143,6 +145,10 @@ export default function Studio() {
 
   const handleProjectSelect = (projectId: number) => {
     setCurrentProjectId(projectId);
+    const project = projects.find(p => p.id === projectId);
+    if (project) {
+      setSelectedProject(project);
+    }
   };
 
   const handleCreateProject = async (name: string) => {
@@ -214,6 +220,9 @@ stack(
         currentProjectId={currentProjectId}
         onProjectSelect={handleProjectSelect}
         onCreateProject={handleCreateProject}
+        onCodeGenerated={setCode}
+        onPlay={handlePlayToggle}
+        isPlaying={isPlaying}
       />
       
       <div className="flex-1 flex flex-col">

@@ -206,5 +206,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI Composition endpoints
+  app.post("/api/ai/compose-track", async (req, res) => {
+    try {
+      const { prompt, maxSteps = 50 } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ message: "Prompt is required" });
+      }
+
+      // Generate initial composition step
+      const initialCode = await generateStrudelPattern(`Start of a ${prompt}`, 120);
+      
+      res.json({
+        step: 1,
+        description: `Started composition: ${prompt}`,
+        code: initialCode,
+        isComplete: false,
+        maxSteps
+      });
+    } catch (error) {
+      console.error('AI composition error:', error);
+      res.status(500).json({ message: "Failed to start composition" });
+    }
+  });
+
+  app.post("/api/ai/continue-composition", async (req, res) => {
+    try {
+      const { currentCode, step } = req.body;
+      
+      if (step >= 50) {
+        return res.json({
+          step,
+          description: "Composition complete - maximum steps reached",
+          code: currentCode,
+          isComplete: true
+        });
+      }
+
+      // Generate next step based on current code
+      const nextStep = await chatWithAI(
+        `Continue this Strudel composition by adding a new layer or variation. Current step ${step}/50. Build upon the existing pattern.`,
+        currentCode
+      );
+
+      // Extract code from AI response
+      const codeMatch = nextStep.match(/```(?:strudel)?\n?([\s\S]*?)\n?```/);
+      const nextCode = codeMatch ? codeMatch[1].trim() : currentCode;
+
+      res.json({
+        step: step + 1,
+        description: `Step ${step + 1}: Enhanced composition`,
+        code: nextCode,
+        isComplete: step >= 49
+      });
+    } catch (error) {
+      console.error('AI composition continuation error:', error);
+      res.status(500).json({ message: "Failed to continue composition" });
+    }
+  });
+
   return httpServer;
 }
