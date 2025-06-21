@@ -1,183 +1,192 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Play, Upload } from "lucide-react";
 
-interface Sample {
-  id: number;
-  name: string;
-  category: string;
-  duration: number;
-}
+const sampleCategories = {
+  ALL: "all",
+  DRUMS: "drums", 
+  MELODIC: "melodic",
+  BASS: "bass",
+  AMBIENT: "ambient"
+};
 
-const sampleCategories = [
-  { name: "drums", icon: "fa-drum", color: "strudel-accent" },
-  { name: "melodic", icon: "fa-music", color: "strudel-secondary" },
-  { name: "bass", icon: "fa-wave-square", color: "strudel-primary" },
-  { name: "ambient", icon: "fa-cloud", color: "strudel-warning" },
-];
+const sampleLibrary = {
+  drums: [
+    { name: "bd", description: "Bass Drum", bank: "RolandTR909" },
+    { name: "sd", description: "Snare Drum", bank: "RolandTR909" },
+    { name: "hh", description: "Hi-Hat Closed", bank: "RolandTR909" },
+    { name: "oh", description: "Hi-Hat Open", bank: "RolandTR909" },
+    { name: "cp", description: "Hand Clap", bank: "RolandTR909" },
+    { name: "rim", description: "Rim Shot", bank: "RolandTR909" },
+    { name: "crash", description: "Crash Cymbal", bank: "RolandTR909" },
+    { name: "ride", description: "Ride Cymbal", bank: "RolandTR909" }
+  ],
+  melodic: [
+    { name: "piano", description: "Piano", bank: "acoustic" },
+    { name: "rhodes", description: "Electric Piano", bank: "electric" },
+    { name: "lead", description: "Synth Lead", bank: "synth" },
+    { name: "pad", description: "String Pad", bank: "synth" },
+    { name: "pluck", description: "Synth Pluck", bank: "synth" },
+    { name: "bell", description: "Bell", bank: "acoustic" }
+  ],
+  bass: [
+    { name: "bass", description: "Bass Synth", bank: "synth" },
+    { name: "subbass", description: "Sub Bass", bank: "synth" },
+    { name: "reese", description: "Reese Bass", bank: "synth" },
+    { name: "wobble", description: "Wobble Bass", bank: "synth" }
+  ],
+  ambient: [
+    { name: "wind", description: "Wind", bank: "nature" },
+    { name: "rain", description: "Rain", bank: "nature" },
+    { name: "noise", description: "White Noise", bank: "noise" },
+    { name: "vinyl", description: "Vinyl Crackle", bank: "texture" }
+  ]
+};
 
 export function SamplesPanel() {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState(sampleCategories.ALL);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: samples = [] } = useQuery({
-    queryKey: ["/api/samples", selectedCategory].filter(Boolean),
-    queryFn: async () => {
-      const url = selectedCategory ? `/api/samples?category=${selectedCategory}` : "/api/samples";
-      const response = await fetch(url);
-      return response.json();
-    },
-  });
-
-  const formatDuration = (duration: number) => {
-    const seconds = Math.floor(duration / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return minutes > 0 ? `${minutes}:${remainingSeconds.toString().padStart(2, '0')}` : `${seconds}s`;
-  };
-
-  const handleSamplePlay = (sample: Sample, e: React.MouseEvent) => {
-    e.stopPropagation();
-    // TODO: Implement sample preview playback
-    console.log("Playing sample:", sample.name);
-  };
-
-  const handleSampleInsert = (sample: Sample) => {
-    // TODO: Implement sample insertion into editor
-    console.log("Inserting sample:", sample.name);
-  };
-
-  const groupedSamples = samples.reduce((acc: Record<string, Sample[]>, sample: Sample) => {
-    if (!acc[sample.category]) {
-      acc[sample.category] = [];
+  const getSamples = () => {
+    let samples: any[] = [];
+    if (selectedCategory === sampleCategories.ALL) {
+      samples = Object.values(sampleLibrary).flat();
+    } else {
+      samples = sampleLibrary[selectedCategory as keyof typeof sampleLibrary] || [];
     }
-    acc[sample.category].push(sample);
-    return acc;
-  }, {});
+    
+    if (searchTerm) {
+      samples = samples.filter(sample => 
+        sample.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        sample.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    return samples;
+  };
+
+  const playSample = (sampleName: string) => {
+    console.log(`Playing sample: ${sampleName}`);
+    // This would integrate with the audio engine
+  };
+
+  const insertSampleCode = (sampleName: string) => {
+    // This would insert s("sampleName") into the editor
+    console.log(`Insert: s("${sampleName}")`);
+  };
 
   return (
-    <ScrollArea className="flex-1">
-      <div className="p-4">
-        {/* Category Filter */}
-        <div className="mb-4">
-          <div className="flex flex-wrap gap-2">
+    <div className="flex flex-col h-full bg-black/90">
+      {/* Header */}
+      <div className="p-4 border-b border-cyan-900/50">
+        <h3 className="text-cyan-300 font-mono text-sm font-semibold">SAMPLES</h3>
+      </div>
+
+      {/* Category Filters */}
+      <div className="p-3 border-b border-cyan-900/30">
+        <div className="grid grid-cols-3 gap-1">
+          {Object.entries(sampleCategories).map(([key, value]) => (
             <Button
-              variant={selectedCategory === null ? "default" : "outline"}
+              key={value}
+              onClick={() => setSelectedCategory(value)}
+              variant={selectedCategory === value ? "default" : "outline"}
               size="sm"
-              onClick={() => setSelectedCategory(null)}
-              className={selectedCategory === null ? "bg-strudel-primary" : ""}
+              className={`text-xs font-mono ${
+                selectedCategory === value
+                  ? "bg-cyan-600 hover:bg-cyan-700 text-white"
+                  : "border-cyan-700 text-cyan-400 hover:bg-cyan-900/30"
+              }`}
             >
-              All
+              {key}
             </Button>
-            {sampleCategories.map((category) => (
-              <Button
-                key={category.name}
-                variant={selectedCategory === category.name ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory(category.name)}
-                className={selectedCategory === category.name ? "bg-strudel-primary" : ""}
-              >
-                <i className={`fas ${category.icon} mr-1`}></i>
-                {category.name}
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          {selectedCategory ? (
-            // Show samples for selected category
-            <div>
-              <h4 className="text-sm font-semibold text-slate-300 mb-2 flex items-center capitalize">
-                <i className={`fas ${sampleCategories.find(c => c.name === selectedCategory)?.icon} mr-2`}></i>
-                {selectedCategory}
-              </h4>
-              <div className="space-y-1">
-                {(groupedSamples[selectedCategory] || []).map((sample: Sample) => (
-                  <div
-                    key={sample.id}
-                    className="flex items-center justify-between p-2 bg-strudel-surface-light rounded-lg hover:bg-strudel-surface-light/80 cursor-pointer group"
-                    onClick={() => handleSampleInsert(sample)}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <button
-                        className="w-6 h-6 bg-strudel-primary hover:bg-strudel-primary/80 rounded flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={(e) => handleSamplePlay(sample, e)}
-                      >
-                        <i className="fas fa-play text-white text-xs"></i>
-                      </button>
-                      <span className="text-sm text-slate-200">{sample.name}</span>
-                    </div>
-                    <span className="text-xs text-slate-500">
-                      {sample.duration ? formatDuration(sample.duration) : "N/A"}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            // Show all categories with samples
-            Object.entries(groupedSamples).map(([categoryName, categorySamples]) => {
-              const categoryInfo = sampleCategories.find(c => c.name === categoryName);
-              return (
-                <div key={categoryName}>
-                  <h4 className="text-sm font-semibold text-slate-300 mb-2 flex items-center capitalize">
-                    <i className={`fas ${categoryInfo?.icon || "fa-folder"} mr-2`}></i>
-                    {categoryName} ({categorySamples.length})
-                  </h4>
-                  <div className="space-y-1">
-                    {categorySamples.slice(0, 3).map((sample: Sample) => (
-                      <div
-                        key={sample.id}
-                        className="flex items-center justify-between p-2 bg-strudel-surface-light rounded-lg hover:bg-strudel-surface-light/80 cursor-pointer group"
-                        onClick={() => handleSampleInsert(sample)}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <button
-                            className="w-6 h-6 bg-strudel-primary hover:bg-strudel-primary/80 rounded flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={(e) => handleSamplePlay(sample, e)}
-                          >
-                            <i className="fas fa-play text-white text-xs"></i>
-                          </button>
-                          <span className="text-sm text-slate-200">{sample.name}</span>
-                        </div>
-                        <span className="text-xs text-slate-500">
-                          {sample.duration ? formatDuration(sample.duration) : "N/A"}
-                        </span>
-                      </div>
-                    ))}
-                    {categorySamples.length > 3 && (
-                      <button
-                        className="w-full text-xs text-strudel-primary hover:text-strudel-primary/80 py-1"
-                        onClick={() => setSelectedCategory(categoryName)}
-                      >
-                        View all {categorySamples.length} samples
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })
-          )}
-
-          {samples.length === 0 && (
-            <div className="text-center py-8">
-              <i className="fas fa-waveform-lines text-slate-500 text-2xl mb-2"></i>
-              <p className="text-slate-400 text-sm">No samples available</p>
-              <p className="text-slate-500 text-xs">Upload samples to get started</p>
-            </div>
-          )}
-        </div>
-
-        {/* Sample Upload */}
-        <div className="border-t border-strudel-surface-light pt-4 mt-6">
-          <button className="w-full p-3 border-2 border-dashed border-strudel-surface-light hover:border-strudel-primary rounded-lg text-slate-400 hover:text-strudel-primary transition-colors group">
-            <i className="fas fa-upload mb-2 group-hover:text-strudel-primary"></i>
-            <div className="text-sm">Upload Sample</div>
-            <div className="text-xs text-slate-500 mt-1">WAV, MP3, FLAC supported</div>
-          </button>
+          ))}
         </div>
       </div>
-    </ScrollArea>
+
+      {/* Search */}
+      <div className="p-3 border-b border-cyan-900/30">
+        <input
+          type="text"
+          placeholder="Search samples..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full p-2 bg-black/50 border border-cyan-700 text-cyan-200 placeholder-cyan-500 font-mono text-xs rounded"
+        />
+      </div>
+
+      {/* Samples List */}
+      <ScrollArea className="flex-1">
+        <div className="p-3 space-y-2">
+          {getSamples().length === 0 ? (
+            <div className="text-center py-8">
+              <div className="text-cyan-500 mb-2">📦</div>
+              <p className="text-cyan-400 text-sm font-mono">No samples available</p>
+              <p className="text-cyan-600 text-xs font-mono mt-1">Upload samples to get started</p>
+            </div>
+          ) : (
+            getSamples().map((sample, index) => (
+              <div
+                key={`${sample.name}-${index}`}
+                className="group p-2 bg-cyan-900/10 border border-cyan-700/30 rounded hover:bg-cyan-900/20 transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <code className="text-cyan-300 font-mono text-sm font-semibold">
+                        {sample.name}
+                      </code>
+                      <Badge 
+                        variant="outline" 
+                        className="text-xs px-1 py-0 border-cyan-600 text-cyan-400"
+                      >
+                        {sample.bank}
+                      </Badge>
+                    </div>
+                    <p className="text-cyan-500 text-xs font-mono mt-1">
+                      {sample.description}
+                    </p>
+                  </div>
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                      onClick={() => playSample(sample.name)}
+                      size="sm"
+                      variant="outline"
+                      className="h-6 w-6 p-0 border-cyan-600 text-cyan-400 hover:bg-cyan-900/50"
+                    >
+                      <Play className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      onClick={() => insertSampleCode(sample.name)}
+                      size="sm"
+                      variant="outline"
+                      className="h-6 w-8 p-0 border-cyan-600 text-cyan-400 hover:bg-cyan-900/50 text-xs font-mono"
+                    >
+                      +
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </ScrollArea>
+
+      {/* Upload Section */}
+      <div className="p-3 border-t border-cyan-900/30">
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full border-cyan-700 text-cyan-400 hover:bg-cyan-900/30 font-mono text-xs"
+        >
+          <Upload className="h-3 w-3 mr-1" />
+          Upload Sample
+        </Button>
+        <p className="text-cyan-600 text-xs font-mono mt-1 text-center">
+          WAV, MP3, FLAC supported
+        </p>
+      </div>
+    </div>
   );
 }

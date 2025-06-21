@@ -1,227 +1,192 @@
-import { useEffect, useRef, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Layers } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface PatternVisualizerProps {
   isPlaying: boolean;
-  currentCode: string;
-  bpm: number;
+  code: string;
+  className?: string;
 }
 
 interface PatternLayer {
   name: string;
-  steps: boolean[];
+  pattern: boolean[];
   color: string;
-  volume: number;
 }
 
-export function PatternVisualizer({ isPlaying, currentCode, bpm }: PatternVisualizerProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
+export function PatternVisualizer({ isPlaying, code, className = "" }: PatternVisualizerProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [patterns, setPatterns] = useState<PatternLayer[]>([]);
+  const [layers, setLayers] = useState<PatternLayer[]>([]);
 
+  // Parse Strudel code to extract patterns
   useEffect(() => {
-    // Parse code to extract patterns
-    const parsePatterns = (code: string): PatternLayer[] => {
-      const layers: PatternLayer[] = [];
-      const patternRegex = /s\("([^"]+)"\)/g;
-      let match;
-      
-      while ((match = patternRegex.exec(code)) !== null) {
-        const patternStr = match[1];
-        const steps = Array(16).fill(false);
-        
-        // Parse mini-notation pattern
-        const parts = patternStr.split(/\s+/);
-        parts.forEach((part, index) => {
-          if (index < 16 && part !== '~' && part !== '') {
-            // Handle multipliers like "bd*4"
-            if (part.includes('*')) {
-              const [sound, multiplier] = part.split('*');
-              const count = parseInt(multiplier) || 1;
-              for (let i = 0; i < count && (index + i) < 16; i++) {
-                steps[index + i] = true;
-              }
-            } else {
-              steps[index] = true;
-            }
-          }
-        });
-        
-        // Determine color based on sample type
-        let color = '#666';
-        let name = 'UNKNOWN';
-        if (patternStr.includes('bd') || patternStr.includes('kick')) {
-          color = '#ff4444';
-          name = 'KICK';
-        } else if (patternStr.includes('sd') || patternStr.includes('sn')) {
-          color = '#44ff44';
-          name = 'SNARE';
-        } else if (patternStr.includes('hh') || patternStr.includes('hihat')) {
-          color = '#ffff44';
-          name = 'HIHAT';
-        } else if (patternStr.includes('cp')) {
-          color = '#ff44ff';
-          name = 'CLAP';
-        } else if (patternStr.includes('oh')) {
-          color = '#44ffff';
-          name = 'OPEN HAT';
-        }
-        
-        layers.push({
-          name,
-          steps,
-          color,
-          volume: 0.7
-        });
-      }
-      
-      return layers;
-    };
-
-    setPatterns(parsePatterns(currentCode));
-  }, [currentCode]);
-
-  useEffect(() => {
-    if (!isPlaying) return;
+    const extractedLayers: PatternLayer[] = [];
     
-    const stepDuration = (60 / bpm / 4) * 1000; // 16th notes
-    const interval = setInterval(() => {
-      setCurrentStep(prev => (prev + 1) % 16);
-    }, stepDuration);
-    
-    return () => clearInterval(interval);
-  }, [isPlaying, bpm]);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const draw = () => {
-      const { width, height } = canvas;
-      
-      // Clear canvas
-      ctx.fillStyle = '#0a0a0a';
-      ctx.fillRect(0, 0, width, height);
-      
-      if (patterns.length === 0) {
-        // Draw empty grid
-        ctx.strokeStyle = '#333';
-        ctx.lineWidth = 1;
+    // Extract drum patterns from code
+    const drumsMatch = code.match(/s\("([^"]+)"\)/g);
+    if (drumsMatch) {
+      drumsMatch.forEach((match, index) => {
+        const pattern = match.match(/s\("([^"]+)"\)/)?.[1] || "";
+        const steps = parsePattern(pattern);
+        const colors = ['#06b6d4', '#f97316', '#eab308', '#10b981', '#8b5cf6'];
         
-        for (let i = 0; i <= 16; i++) {
-          const x = (i / 16) * width;
-          ctx.beginPath();
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, height);
-          ctx.stroke();
-        }
-        
-        ctx.font = '12px monospace';
-        ctx.fillStyle = '#666';
-        ctx.textAlign = 'center';
-        ctx.fillText('No patterns detected', width / 2, height / 2);
-        return;
-      }
-      
-      const rowHeight = height / Math.max(patterns.length, 1);
-      const stepWidth = width / 16;
-      
-      patterns.forEach((pattern, rowIndex) => {
-        const y = rowIndex * rowHeight;
-        
-        // Draw pattern name
-        ctx.font = '10px monospace';
-        ctx.fillStyle = pattern.color;
-        ctx.textAlign = 'left';
-        ctx.fillText(pattern.name, 4, y + 12);
-        
-        // Draw steps
-        pattern.steps.forEach((active, stepIndex) => {
-          const x = stepIndex * stepWidth;
-          const isCurrentStep = stepIndex === currentStep && isPlaying;
-          
-          // Step background
-          ctx.fillStyle = isCurrentStep ? '#333' : '#111';
-          ctx.fillRect(x, y, stepWidth - 1, rowHeight - 1);
-          
-          // Step border
-          ctx.strokeStyle = isCurrentStep ? '#fff' : '#222';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(x, y, stepWidth - 1, rowHeight - 1);
-          
-          // Active step indicator
-          if (active) {
-            ctx.fillStyle = isCurrentStep ? '#fff' : pattern.color;
-            const padding = 3;
-            ctx.fillRect(
-              x + padding, 
-              y + padding + 14, 
-              stepWidth - padding * 2 - 1, 
-              rowHeight - padding * 2 - 1 - 14
-            );
-          }
-          
-          // Step number
-          if (rowIndex === 0) {
-            ctx.font = '8px monospace';
-            ctx.fillStyle = '#666';
-            ctx.textAlign = 'center';
-            ctx.fillText(
-              stepIndex.toString(), 
-              x + stepWidth / 2, 
-              y + 10
-            );
-          }
+        extractedLayers.push({
+          name: getPatternName(pattern, index),
+          pattern: steps,
+          color: colors[index % colors.length]
         });
       });
-      
-      // Draw beat markers (every 4 steps)
-      ctx.strokeStyle = '#555';
-      ctx.lineWidth = 2;
-      for (let i = 0; i <= 16; i += 4) {
-        const x = (i / 16) * width;
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
+    }
+
+    // Add bass patterns
+    const bassMatch = code.match(/note\("([^"]+)"\)/g);
+    if (bassMatch) {
+      bassMatch.forEach((match, index) => {
+        const pattern = match.match(/note\("([^"]+)"\)/)?.[1] || "";
+        const steps = parseNotePattern(pattern);
+        
+        extractedLayers.push({
+          name: `BASS ${index + 1}`,
+          pattern: steps,
+          color: '#dc2626'
+        });
+      });
+    }
+
+    // Fallback patterns if no code
+    if (extractedLayers.length === 0) {
+      extractedLayers.push(
+        { name: 'KICK', pattern: [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false], color: '#06b6d4' },
+        { name: 'SNARE', pattern: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false], color: '#f97316' },
+        { name: 'HIHAT', pattern: [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true], color: '#eab308' }
+      );
+    }
+
+    setLayers(extractedLayers);
+  }, [code]);
+
+  // Animation loop
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const interval = setInterval(() => {
+      setCurrentStep((prev) => (prev + 1) % 16);
+    }, 120); // ~125 BPM
+
+    return () => clearInterval(interval);
+  }, [isPlaying]);
+
+  // Reset step when stopped
+  useEffect(() => {
+    if (!isPlaying) {
+      setCurrentStep(0);
+    }
+  }, [isPlaying]);
+
+  const parsePattern = (pattern: string): boolean[] => {
+    const steps = Array(16).fill(false);
+    const parts = pattern.split(/[,\s]+/).filter(p => p.trim());
+    
+    parts.forEach((part, index) => {
+      if (part.includes('*')) {
+        const [sound, mult] = part.split('*');
+        const multiplier = parseInt(mult) || 1;
+        for (let i = 0; i < 16; i += Math.floor(16 / multiplier)) {
+          if (i < 16) steps[i] = true;
+        }
+      } else if (part !== '~' && part.trim()) {
+        steps[index % 16] = true;
       }
-    };
+    });
+    
+    return steps;
+  };
 
-    const animate = () => {
-      draw();
-      animationRef.current = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
+  const parseNotePattern = (pattern: string): boolean[] => {
+    const steps = Array(16).fill(false);
+    const notes = pattern.split(/\s+/).filter(n => n.trim());
+    
+    notes.forEach((note, index) => {
+      if (note !== '~' && note.trim()) {
+        steps[index % 16] = true;
       }
-    };
-  }, [patterns, currentStep, isPlaying]);
+    });
+    
+    return steps;
+  };
+
+  const getPatternName = (pattern: string, index: number): string => {
+    if (pattern.includes('bd')) return 'KICK';
+    if (pattern.includes('sd')) return 'SNARE';
+    if (pattern.includes('hh')) return 'HIHAT';
+    if (pattern.includes('cp')) return 'CLAP';
+    if (pattern.includes('oh')) return 'OPENHAT';
+    return `LAYER ${index + 1}`;
+  };
 
   return (
-    <Card className="bg-black/90 border-blue-900/50">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-mono text-blue-400 flex items-center gap-2">
-          <Layers className="h-4 w-4" />
-          PATTERN GRID
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-2">
-        <canvas
-          ref={canvasRef}
-          width={400}
-          height={200}
-          className="w-full h-[200px] border border-blue-900/30 rounded"
-        />
-      </CardContent>
-    </Card>
+    <div className={`bg-black rounded border border-cyan-700/30 p-3 ${className}`}>
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-cyan-300 text-xs font-mono font-semibold">PATTERN GRID</span>
+        <div className="flex items-center gap-2">
+          <span className="text-cyan-500 text-xs font-mono">
+            STEP: {String(currentStep + 1).padStart(2, '0')}/16
+          </span>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        {layers.map((layer, layerIndex) => (
+          <div key={layerIndex} className="flex items-center gap-2">
+            <div className="w-12 text-right">
+              <span className="text-xs font-mono font-semibold" style={{ color: layer.color }}>
+                {layer.name}
+              </span>
+            </div>
+            <div className="flex gap-1">
+              {layer.pattern.map((active, stepIndex) => (
+                <div
+                  key={stepIndex}
+                  className={`w-3 h-3 rounded-sm border transition-all duration-75 ${
+                    stepIndex === currentStep && isPlaying
+                      ? 'border-white scale-110 shadow-lg'
+                      : 'border-gray-600'
+                  } ${
+                    active
+                      ? stepIndex === currentStep && isPlaying
+                        ? 'shadow-lg'
+                        : ''
+                      : 'opacity-30'
+                  }`}
+                  style={{
+                    backgroundColor: active ? layer.color : 'transparent',
+                    boxShadow: stepIndex === currentStep && isPlaying && active 
+                      ? `0 0 8px ${layer.color}` 
+                      : 'none'
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Beat indicator */}
+      <div className="flex justify-between mt-3 pt-2 border-t border-cyan-700/30">
+        <div className="flex gap-1">
+          {Array.from({ length: 4 }, (_, i) => (
+            <div
+              key={i}
+              className={`w-2 h-2 rounded-full ${
+                Math.floor(currentStep / 4) === i && isPlaying
+                  ? 'bg-cyan-400 animate-pulse'
+                  : 'bg-gray-600'
+              }`}
+            />
+          ))}
+        </div>
+        <span className="text-cyan-500 text-xs font-mono">
+          {isPlaying ? 'PLAYING' : 'STOPPED'}
+        </span>
+      </div>
+    </div>
   );
 }

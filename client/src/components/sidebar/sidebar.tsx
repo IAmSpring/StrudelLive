@@ -71,6 +71,17 @@ export function Sidebar({
           <i className="fas fa-robot mr-2"></i>
           AI Chat
         </button>
+        <button
+          className={`flex-1 px-4 py-3 text-sm font-medium flex items-center justify-center ${
+            activeTab === "composer"
+              ? "bg-strudel-surface-light strudel-primary border-b-2 border-strudel-primary"
+              : "text-slate-400 hover:text-slate-200"
+          }`}
+          onClick={() => setActiveTab("composer")}
+        >
+          <i className="fas fa-magic mr-2"></i>
+          Composer
+        </button>
       </div>
 
       {/* Panel Content */}

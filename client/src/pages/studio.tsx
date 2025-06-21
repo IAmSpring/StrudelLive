@@ -4,6 +4,8 @@ import { TopBar } from "@/components/layout/top-bar";
 import { MonacoEditor } from "@/components/editor/monaco-editor";
 import { SamplesPanel } from "@/components/panels/samples-panel";
 import { ConsolePanel } from "@/components/panels/console-panel";
+import { WaveformDisplay } from "@/components/visualizers/waveform-display";
+import { PatternVisualizer } from "@/components/visualizers/pattern-visualizer";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useAutoSave, useAutoSaveToggle } from "@/hooks/use-auto-save";
@@ -240,49 +242,70 @@ stack(
         
         <div className="flex-1 flex">
           <div className="flex-1 flex flex-col">
-            <MonacoEditor
-              code={code}
-              onChange={handleCodeChange}
-              onEvaluate={handleCodeEvaluate}
-              isPerformanceMode={isStudioMode}
-            />
+            <div className="flex-1 flex">
+              <div className="flex-1">
+                <MonacoEditor
+                  code={code}
+                  onChange={handleCodeChange}
+                  onEvaluate={handleCodeEvaluate}
+                  isPerformanceMode={isStudioMode}
+                />
+              </div>
+              {/* Visualizer Panel */}
+              <div className="w-80 bg-black border-l border-cyan-900/50 flex flex-col">
+                <div className="p-3 border-b border-cyan-900/50">
+                  <h3 className="text-cyan-300 font-mono text-sm font-semibold">VISUALIZERS</h3>
+                </div>
+                <div className="flex-1 p-3 space-y-3 overflow-y-auto">
+                  <WaveformDisplay isPlaying={isPlaying} />
+                  <PatternVisualizer isPlaying={isPlaying} code={code} />
+                </div>
+              </div>
+            </div>
             
             {/* Status Bar */}
-            <div className="h-8 bg-strudel-surface border-t border-strudel-surface-light flex items-center justify-between px-4 text-xs">
-              <div className="flex items-center space-x-4">
-                <span className="text-slate-400">
-                  BPM: <span className="strudel-accent">{currentProject?.bpm || 120}</span>
+            <div className="h-8 bg-black border-t border-cyan-900/50 flex items-center justify-between px-4 text-xs font-mono">
+              <div className="flex items-center space-x-6">
+                <span className="text-cyan-500">
+                  BPM: <span className="text-cyan-300 font-semibold">{currentProject?.bpm || 120}</span>
                 </span>
-                <span className="text-slate-400">
-                  CPU: <span className="strudel-warning">{audioEngine.cpuUsage}%</span>
+                <span className="text-cyan-500">
+                  CPU: <span className="text-orange-300 font-semibold">{audioEngine.cpuUsage}%</span>
+                </span>
+                <span className="text-cyan-500">
+                  Latency: <span className="text-green-300 font-semibold">{audioEngine.latency}ms</span>
                 </span>
               </div>
               <div className="flex items-center space-x-4">
-                <span className="text-slate-400">
-                  Latency: <span className="strudel-accent">{audioEngine.latency}ms</span>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-green-300 font-semibold">LIVE</span>
+                </div>
+                <span className="text-cyan-500">
+                  Mode: <span className="text-purple-300 font-semibold">CODE</span>
                 </span>
               </div>
             </div>
           </div>
           
           {/* Right Panel */}
-          <div className="w-80 bg-strudel-surface border-l border-strudel-surface-light">
-            <div className="flex border-b border-strudel-surface-light">
+          <div className="w-80 bg-black border-l border-cyan-900/50">
+            <div className="flex border-b border-cyan-900/50">
               <button
-                className={`flex-1 px-4 py-3 text-sm font-medium ${
+                className={`flex-1 px-4 py-3 text-sm font-medium font-mono ${
                   rightPanelTab === "samples"
-                    ? "bg-strudel-surface-light strudel-primary border-b-2 border-strudel-primary"
-                    : "text-slate-400 hover:text-slate-200"
+                    ? "bg-cyan-900/30 text-cyan-300 border-b-2 border-cyan-400"
+                    : "text-cyan-500 hover:text-cyan-300"
                 }`}
                 onClick={() => setRightPanelTab("samples")}
               >
                 Samples
               </button>
               <button
-                className={`flex-1 px-4 py-3 text-sm font-medium ${
+                className={`flex-1 px-4 py-3 text-sm font-medium font-mono ${
                   rightPanelTab === "console"
-                    ? "bg-strudel-surface-light strudel-primary border-b-2 border-strudel-primary"
-                    : "text-slate-400 hover:text-slate-200"
+                    ? "bg-cyan-900/30 text-cyan-300 border-b-2 border-cyan-400"
+                    : "text-cyan-500 hover:text-cyan-300"
                 }`}
                 onClick={() => setRightPanelTab("console")}
               >
