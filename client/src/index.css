@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+
+  /* Strudel theme colors */
+  --strudel-primary: hsl(244, 76%, 63%);
+  --strudel-secondary: hsl(258, 89%, 66%);
+  --strudel-accent: hsl(158, 64%, 52%);
+  --strudel-warning: hsl(43, 96%, 56%);
+  --strudel-error: hsl(0, 84%, 60%);
+  --strudel-dark: hsl(235, 39%, 7%);
+  --strudel-surface: hsl(244, 39%, 15%);
+  --strudel-surface-light: hsl(244, 32%, 24%);
+}
+
+.dark {
+  --background: hsl(235, 39%, 7%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(244, 32%, 24%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(244, 39%, 15%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(244, 39%, 15%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(244, 32%, 24%);
+  --input: hsl(244, 32%, 24%);
+  --primary: hsl(244, 76%, 63%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(244, 32%, 24%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(244, 32%, 24%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased text-foreground overflow-hidden h-screen;
+    background: var(--strudel-dark);
+    color: hsl(0, 0%, 98%);
+  }
+}
+
+@layer utilities {
+  .strudel-primary {
+    color: var(--strudel-primary);
+  }
+  
+  .bg-strudel-primary {
+    background-color: var(--strudel-primary);
+  }
+  
+  .strudel-secondary {
+    color: var(--strudel-secondary);
+  }
+  
+  .bg-strudel-secondary {
+    background-color: var(--strudel-secondary);
+  }
+  
+  .strudel-accent {
+    color: var(--strudel-accent);
+  }
+  
+  .bg-strudel-accent {
+    background-color: var(--strudel-accent);
+  }
+  
+  .strudel-warning {
+    color: var(--strudel-warning);
+  }
+  
+  .bg-strudel-warning {
+    background-color: var(--strudel-warning);
+  }
+  
+  .strudel-error {
+    color: var(--strudel-error);
+  }
+  
+  .bg-strudel-error {
+    background-color: var(--strudel-error);
+  }
+  
+  .bg-strudel-dark {
+    background-color: var(--strudel-dark);
+  }
+  
+  .bg-strudel-surface {
+    background-color: var(--strudel-surface);
+  }
+  
+  .bg-strudel-surface-light {
+    background-color: var(--strudel-surface-light);
+  }
+  
+  .border-strudel-surface-light {
+    border-color: var(--strudel-surface-light);
+  }
+}
+
+/* Monaco Editor customization */
+.monaco-editor {
+  background-color: var(--strudel-dark) !important;
+}
+
+.monaco-editor .margin {
+  background-color: var(--strudel-dark) !important;
+}
+
+.monaco-editor .current-line {
+  background-color: var(--strudel-surface-light) !important;
+}
+
+/* Performance optimizations */
+.performance-mode {
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+
+.performance-mode .monaco-editor {
+  font-size: 1.125rem !important;
+  line-height: 1.75 !important;
+}
