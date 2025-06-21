@@ -134,6 +134,17 @@ export function AIComposer({ onCodeGenerated, onPlay, isPlaying }: AIComposerPro
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Instructions */}
+        <div className="bg-purple-900/20 border border-purple-700/30 rounded p-3">
+          <h4 className="text-purple-300 font-mono text-xs font-semibold mb-2">HOW TO USE:</h4>
+          <ul className="text-purple-400 font-mono text-xs space-y-1">
+            <li>• Describe the track you want to create</li>
+            <li>• AI will compose iteratively (up to 50 steps)</li>
+            <li>• Each step adds layers, variations, or effects</li>
+            <li>• Click CONTINUE to extend beyond 50 steps</li>
+          </ul>
+        </div>
+
         {/* Composition Prompt */}
         <div className="space-y-2">
           <label className="text-sm font-mono text-purple-300">
@@ -142,7 +153,7 @@ export function AIComposer({ onCodeGenerated, onPlay, isPlaying }: AIComposerPro
           <textarea
             value={compositionPrompt}
             onChange={(e) => setCompositionPrompt(e.target.value)}
-            placeholder="e.g., 'progressive techno with evolving bassline'"
+            placeholder="e.g., 'progressive techno with evolving bassline and atmospheric pads that builds tension'"
             className="w-full h-16 p-2 bg-black/50 border border-purple-700 text-purple-200 placeholder-purple-500 font-mono text-xs resize-none"
             disabled={isComposing}
           />

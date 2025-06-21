@@ -10,6 +10,8 @@ interface SidebarProps {
   onCodeGenerated?: (code: string) => void;
   onPlay?: () => void;
   isPlaying?: boolean;
+  activeTab?: "projects" | "chat" | "composer";
+  onTabChange?: (tab: "projects" | "chat" | "composer") => void;
 }
 
 export function Sidebar({ 
@@ -18,9 +20,14 @@ export function Sidebar({
   onCreateProject,
   onCodeGenerated,
   onPlay,
-  isPlaying = false
+  isPlaying = false,
+  activeTab: controlledActiveTab,
+  onTabChange
 }: SidebarProps) {
-  const [activeTab, setActiveTab] = useState<"projects" | "chat" | "composer">("projects");
+  const [internalActiveTab, setInternalActiveTab] = useState<"projects" | "chat" | "composer">("projects");
+  
+  const activeTab = controlledActiveTab || internalActiveTab;
+  const setActiveTab = onTabChange || setInternalActiveTab;
   const [isStreaming] = useState(true);
 
   return (

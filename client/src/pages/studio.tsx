@@ -6,6 +6,7 @@ import { SamplesPanel } from "@/components/panels/samples-panel";
 import { ConsolePanel } from "@/components/panels/console-panel";
 import { WaveformDisplay } from "@/components/visualizers/waveform-display";
 import { PatternVisualizer } from "@/components/visualizers/pattern-visualizer";
+import { WelcomeOverlay } from "@/components/onboarding/welcome-overlay";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useAutoSave, useAutoSaveToggle } from "@/hooks/use-auto-save";
@@ -26,6 +27,8 @@ export default function Studio() {
     level: string;
     content: string;
   }>>([]);
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [sidebarTab, setSidebarTab] = useState<"projects" | "chat" | "composer">("projects");
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -225,6 +228,8 @@ stack(
         onCodeGenerated={setCode}
         onPlay={handlePlayToggle}
         isPlaying={isPlaying}
+        activeTab={sidebarTab}
+        onTabChange={setSidebarTab}
       />
       
       <div className="flex-1 flex flex-col">
