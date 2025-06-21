@@ -5,8 +5,16 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || "default_key"
 });
 
+// OpenAI Assistant configuration for StrudelLive
+const STRUDEL_ASSISTANT_ID = process.env.OPENAI_ASSISTANT_ID || null;
+
 export async function chatWithAI(userMessage: string, currentCode?: string): Promise<string> {
   try {
+    // Use custom assistant if available
+    if (STRUDEL_ASSISTANT_ID && process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== "default_key") {
+      return await chatWithAssistant(userMessage, currentCode);
+    }
+
     const systemPrompt = `You are an expert Strudel live coding assistant. Strudel is a pattern-based music programming language for live coding performances.
 
 Key Strudel concepts:
@@ -37,6 +45,52 @@ Provide helpful, practical advice for live coding. If the user has errors, sugge
   } catch (error) {
     console.error("OpenAI API error:", error);
     return "I'm having trouble connecting to the AI service. Please check your API key configuration and try again.";
+  }
+}
+
+// Function to use OpenAI Assistant API
+async function chatWithAssistant(userMessage: string, currentCode?: string): Promise<string> {
+  try {
+    // Create a thread
+    const thread = await openai.beta.threads.create();
+    
+    // Add the user message with current code context
+    const messageContent = currentCode 
+      ? `Current Strudel code:\n\`\`\`\n${currentCode}\n\`\`\`\n\n${userMessage}`
+      : userMessage;
+    
+    await openai.beta.threads.messages.create(thread.id, {
+      role: "user",
+      content: messageContent
+    });
+
+    // Run the assistant
+    const run = await openai.beta.threads.runs.create(thread.id, {
+      assistant_id: STRUDEL_ASSISTANT_ID!
+    });
+
+    // Wait for completion
+    let runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+    while (runStatus.status === 'in_progress' || runStatus.status === 'queued') {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+    }
+
+    if (runStatus.status === 'completed') {
+      // Get the assistant's response
+      const messages = await openai.beta.threads.messages.list(thread.id);
+      const assistantMessage = messages.data.find(msg => msg.role === 'assistant');
+      
+      if (assistantMessage && assistantMessage.content[0].type === 'text') {
+        return assistantMessage.content[0].text.value;
+      }
+    }
+
+    throw new Error(`Assistant run failed with status: ${runStatus.status}`);
+  } catch (error) {
+    console.error("Assistant API error:", error);
+    // Fall back to regular chat completion
+    throw error;
   }
 }
 

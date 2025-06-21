@@ -100,6 +100,8 @@ export const insertProjectSchema = createInsertSchema(projects).pick({
   isPublic: true,
   bpm: true,
   metadata: true,
+}).partial().extend({
+  name: z.string().min(1, "Project name is required"),
 });
 
 export const insertProjectSnapshotSchema = createInsertSchema(projectSnapshots).pick({
