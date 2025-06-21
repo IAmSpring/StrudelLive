@@ -27,9 +27,17 @@ export class StrudelAudioEngine {
   private async initializeAudioContext() {
     try {
       this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      
+      // Resume context if suspended (required by browsers for user interaction)
+      if (this.audioContext.state === 'suspended') {
+        console.log("Audio context suspended, will resume on user interaction");
+      }
+      
       this.masterGain = this.audioContext.createGain();
       this.masterGain.connect(this.audioContext.destination);
       this.masterGain.gain.value = 0.7;
+      
+      console.log("Audio context initialized:", this.audioContext.state);
     } catch (error) {
       console.error("Failed to initialize audio context:", error);
       throw new Error("Audio initialization failed");
