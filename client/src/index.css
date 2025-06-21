@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Strudel Live Coding Theme */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+body {
+  font-family: 'JetBrains Mono', monospace;
+  background: radial-gradient(ellipse at center, #0a0a0a 0%, #000000 100%);
+  min-height: 100vh;
+}
+
 :root {
   --background: hsl(0, 0%, 100%);
   --foreground: hsl(20, 14.3%, 4.1%);
