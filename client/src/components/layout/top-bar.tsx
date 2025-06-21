@@ -8,6 +8,9 @@ interface TopBarProps {
   onStop: () => void;
   isStudioMode: boolean;
   onStudioModeToggle: () => void;
+  isAutoSaveEnabled: boolean;
+  onToggleAutoSave: () => void;
+  onGenerateRandomBeat: () => void;
 }
 
 export function TopBar({ 
@@ -16,7 +19,10 @@ export function TopBar({
   onPlayToggle, 
   onStop, 
   isStudioMode, 
-  onStudioModeToggle 
+  onStudioModeToggle,
+  isAutoSaveEnabled,
+  onToggleAutoSave,
+  onGenerateRandomBeat
 }: TopBarProps) {
   return (
     <div className="h-16 bg-strudel-surface border-b border-strudel-surface-light flex items-center justify-between px-6">
@@ -28,11 +34,19 @@ export function TopBar({
               {currentProject?.name || "No project selected"}
             </span>
           </div>
-          <div className="flex items-center space-x-1 text-xs">
-            <div className="w-2 h-2 bg-strudel-accent rounded-full"></div>
-            <span className="strudel-accent">Auto-saved</span>
-          </div>
-          <button className="px-3 py-1 bg-strudel-warning hover:bg-strudel-warning/80 text-white text-xs rounded-lg transition-colors">
+          <button 
+            onClick={onToggleAutoSave}
+            className="flex items-center space-x-1 text-xs px-2 py-1 rounded-lg transition-colors hover:bg-strudel-surface-light"
+          >
+            <div className={`w-2 h-2 rounded-full ${isAutoSaveEnabled ? 'bg-strudel-accent' : 'bg-slate-500'}`}></div>
+            <span className={isAutoSaveEnabled ? 'strudel-accent' : 'text-slate-500'}>
+              Auto-save {isAutoSaveEnabled ? 'ON' : 'OFF'}
+            </span>
+          </button>
+          <button 
+            onClick={onGenerateRandomBeat}
+            className="px-3 py-1 bg-strudel-warning hover:bg-strudel-warning/80 text-white text-xs rounded-lg transition-colors"
+          >
             Generate Beat
           </button>
         </div>

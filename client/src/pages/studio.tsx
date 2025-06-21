@@ -6,7 +6,7 @@ import { SamplesPanel } from "@/components/panels/samples-panel";
 import { ConsolePanel } from "@/components/panels/console-panel";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { useAutoSave } from "@/hooks/use-auto-save";
+import { useAutoSave, useAutoSaveToggle } from "@/hooks/use-auto-save";
 import { useAudioEngine } from "@/hooks/use-audio-engine";
 import { useWebSocket } from "@/hooks/use-websocket";
 import { useToast } from "@/hooks/use-toast";
@@ -26,6 +26,7 @@ export default function Studio() {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isAutoSaveEnabled, toggleAutoSave } = useAutoSaveToggle();
 
   // Fetch current project
   const { data: currentProject } = useQuery({
@@ -34,7 +35,7 @@ export default function Studio() {
   });
 
   // Auto-save hook
-  useAutoSave(currentProjectId, code);
+  useAutoSave(currentProjectId, code, isAutoSaveEnabled);
 
   // Audio engine hook
   const audioEngine = useAudioEngine();
@@ -156,6 +157,26 @@ export default function Studio() {
     }
   };
 
+  const handleGenerateRandomBeat = async () => {
+    try {
+      const response = await apiRequest("POST", "/api/generate/random-beat");
+      const data = await response.json();
+      setCode(data.code);
+      addConsoleMessage("info", "Random beat generated");
+      toast({
+        title: "Beat Generated",
+        description: "A random beat pattern has been created.",
+      });
+    } catch (error) {
+      addConsoleMessage("error", "Failed to generate random beat");
+      toast({
+        title: "Generation Failed",
+        description: "Could not generate random beat. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="flex h-screen bg-strudel-dark">
       <Sidebar 
@@ -172,6 +193,9 @@ export default function Studio() {
           onStop={handleStop}
           isStudioMode={isStudioMode}
           onStudioModeToggle={() => setIsStudioMode(!isStudioMode)}
+          isAutoSaveEnabled={isAutoSaveEnabled}
+          onToggleAutoSave={toggleAutoSave}
+          onGenerateRandomBeat={handleGenerateRandomBeat}
         />
         
         <div className="flex-1 flex">
