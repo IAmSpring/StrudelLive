@@ -96,10 +96,15 @@ export class StrudelAudioEngine {
     }
 
     if (this.audioContext.state === "suspended") {
+      console.log("Resuming suspended audio context...");
       await this.audioContext.resume();
     }
 
     this.isPlaying = true;
+    console.log("Audio engine started, context state:", this.audioContext.state);
+    
+    // Play a test tone to verify audio is working
+    this.playTestTone();
   }
 
   stop(): void {
@@ -243,11 +248,11 @@ export class StrudelAudioEngine {
   }
 
   async loadDefaultSamples(): Promise<void> {
-    // Load basic drum samples - in a real implementation,
-    // these would be actual audio files or from a sample library
-    const defaultSamples = [
-      { name: "bd", url: "/samples/bd.wav" },
-      { name: "sn", url: "/samples/sn.wav" },
+    console.log("Loading default samples...");
+    // Create synthetic samples since we don't have audio files
+    const sampleNames = ["bd", "sd", "sn", "hh", "cp", "oh", "rim", "kick", "snare", "hihat"];
+    sampleNames.forEach(name => this.createSyntheticSample(name));
+    console.log("Default samples loaded:", Array.from(this.samples.keys()));
       { name: "hh", url: "/samples/hh.wav" },
       { name: "cp", url: "/samples/cp.wav" },
       { name: "oh", url: "/samples/oh.wav" },

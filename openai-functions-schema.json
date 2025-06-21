@@ -1,8 +1,3 @@
-# OpenAI Browser Function Schema
-
-Here's the complete OpenAI function schema that enables your assistant to directly control the browser through API calls:
-
-```json
 {
   "functions": [
     {
@@ -286,37 +281,3 @@ Here's the complete OpenAI function schema that enables your assistant to direct
     }
   ]
 }
-```
-
-## Usage Instructions
-
-To use these functions in your OpenAI Assistant:
-
-1. Copy the JSON schema above into your assistant's function definitions
-2. The AI can now call these functions directly to control the Strudel live coding platform
-3. Each function corresponds to a specific browser action or API endpoint
-4. The AI can chain multiple function calls to create complex workflows
-
-## Example Function Calls
-
-```javascript
-// Start a beat
-audio_engine_evaluate({
-  "code": "s(\"bd*4, hh*8, ~ sd ~ sd\").gain(.7)"
-})
-
-// Create and load a new project
-create_project({
-  "name": "My Techno Set",
-  "code": "s(\"bd*4, hh*8\").bank(\"RolandTR909\")",
-  "bpm": 128
-})
-
-// Play individual samples for testing
-play_sample({
-  "sampleName": "bd",
-  "gain": 0.8
-})
-```
-
-This enables your AI assistant to provide hands-on, interactive help with live coding, directly manipulating the audio engine and project management through the browser interface.
