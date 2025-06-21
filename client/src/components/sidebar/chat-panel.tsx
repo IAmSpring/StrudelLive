@@ -7,34 +7,34 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import type { ChatMessage } from "@shared/schema";
 
 interface ChatPanelProps {
-  currentProjectId: number | null;
+  projectId: number | null;
 }
 
-export function ChatPanel({ currentProjectId }: ChatPanelProps) {
+export function ChatPanel({ projectId }: ChatPanelProps) {
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
   const { data: messages = [] } = useQuery({
-    queryKey: ["/api/projects", currentProjectId, "chat"],
-    enabled: !!currentProjectId,
+    queryKey: ["/api/projects", projectId, "chat"],
+    enabled: !!projectId,
   });
 
   const sendMessageMutation = useMutation({
     mutationFn: async (content: string) => {
-      return apiRequest("POST", `/api/projects/${currentProjectId}/chat`, {
+      return apiRequest("POST", `/api/projects/${projectId}/chat`, {
         role: "user",
         content,
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/projects", currentProjectId, "chat"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "chat"] });
       setMessage("");
     },
   });
 
   const handleSendMessage = () => {
-    if (message.trim() && currentProjectId) {
+    if (message.trim() && projectId) {
       sendMessageMutation.mutate(message.trim());
     }
   };
@@ -61,13 +61,13 @@ export function ChatPanel({ currentProjectId }: ChatPanelProps) {
     return date.toLocaleDateString();
   };
 
-  if (!currentProjectId) {
+  if (!projectId) {
     return (
       <div className="flex items-center justify-center h-full p-4">
         <div className="text-center">
-          <i className="fas fa-robot text-slate-500 text-3xl mb-3"></i>
-          <p className="text-slate-400 text-sm">Select a project to start chatting</p>
-          <p className="text-slate-500 text-xs mt-1">AI assistant will help with your Strudel patterns</p>
+          <div className="text-slate-500 text-3xl mb-3">🤖</div>
+          <p className="text-slate-400 text-sm font-mono">SELECT PROJECT TO CHAT</p>
+          <p className="text-slate-500 text-xs mt-1 font-mono">AI assistant will help with Strudel patterns</p>
         </div>
       </div>
     );

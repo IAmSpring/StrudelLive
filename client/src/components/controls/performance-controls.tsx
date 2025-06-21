@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
+import { Play, Square } from "lucide-react";
 
 interface PerformanceControlsProps {
   isPlaying: boolean;
@@ -17,80 +16,49 @@ export function PerformanceControls({
   isStudioMode,
   onStudioModeToggle,
 }: PerformanceControlsProps) {
-  const [volume, setVolume] = useState([75]);
-  const [isRecording, setIsRecording] = useState(false);
-
   return (
-    <div className="flex items-center space-x-4">
-      {/* Playback Controls */}
-      <div className="flex items-center space-x-2">
+    <div className="space-y-4">
+      <div className="flex gap-2">
         <Button
           onClick={onPlayToggle}
-          className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors text-lg ${
-            isPlaying
-              ? "bg-strudel-warning hover:bg-strudel-warning/80"
-              : "bg-strudel-accent hover:bg-strudel-accent/80"
-          } text-white`}
+          variant={isPlaying ? "destructive" : "default"}
+          size="sm"
+          className="flex-1 font-mono text-sm"
         >
-          <i className={`fas ${isPlaying ? "fa-pause" : "fa-play"}`}></i>
+          {isPlaying ? (
+            <>
+              <Square className="h-4 w-4 mr-1" />
+              STOP
+            </>
+          ) : (
+            <>
+              <Play className="h-4 w-4 mr-1" />
+              PLAY
+            </>
+          )}
         </Button>
         
         <Button
           onClick={onStop}
-          className="w-10 h-10 bg-strudel-surface-light hover:bg-strudel-surface-light/80 text-slate-300 rounded-lg flex items-center justify-center transition-colors"
+          variant="outline"
+          size="sm"
+          disabled={!isPlaying}
+          className="border-cyan-700 text-cyan-400 hover:bg-cyan-900/30"
         >
-          <i className="fas fa-stop"></i>
+          <Square className="h-4 w-4" />
         </Button>
-        
+      </div>
+
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-mono text-cyan-300">MODE:</span>
         <Button
-          onClick={() => setIsRecording(!isRecording)}
-          className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
-            isRecording
-              ? "bg-strudel-error hover:bg-strudel-error/80 text-white"
-              : "bg-strudel-surface-light hover:bg-strudel-surface-light/80 text-slate-300"
-          }`}
-        >
-          <i className={`fas ${isRecording ? "fa-stop" : "fa-circle"}`}></i>
-        </Button>
-      </div>
-
-      {/* View Mode Toggle */}
-      <div className="flex items-center space-x-1 bg-strudel-surface-light rounded-lg p-1">
-        <button
-          className={`px-3 py-1 text-xs rounded-md transition-colors ${
-            !isStudioMode
-              ? "bg-strudel-primary text-white"
-              : "text-slate-400 hover:text-slate-200"
-          }`}
-          onClick={() => !isStudioMode ? null : onStudioModeToggle()}
-        >
-          Code
-        </button>
-        <button
-          className={`px-3 py-1 text-xs rounded-md transition-colors ${
-            isStudioMode
-              ? "bg-strudel-primary text-white"
-              : "text-slate-400 hover:text-slate-200"
-          }`}
           onClick={onStudioModeToggle}
+          variant={isStudioMode ? "default" : "outline"}
+          size="sm"
+          className={`text-xs font-mono ${isStudioMode ? 'bg-purple-600 hover:bg-purple-700' : 'border-cyan-700 text-cyan-400 hover:bg-cyan-900/30'}`}
         >
-          Studio
-        </button>
-      </div>
-
-      {/* Volume Control */}
-      <div className="flex items-center space-x-2">
-        <i className="fas fa-volume-up text-slate-400 text-sm"></i>
-        <div className="w-16">
-          <Slider
-            value={volume}
-            onValueChange={setVolume}
-            max={100}
-            step={1}
-            className="cursor-pointer"
-          />
-        </div>
-        <span className="text-xs text-slate-400 w-8">{volume[0]}%</span>
+          {isStudioMode ? "STUDIO" : "CODE"}
+        </Button>
       </div>
     </div>
   );
