@@ -142,10 +142,15 @@ export function ProjectsPanel({ currentProjectId, onProjectSelect, onCreateProje
                     className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-slate-200"
                     onClick={(e) => {
                       e.stopPropagation();
-                      // TODO: Implement duplicate functionality
+                      // Save snapshot functionality
+                      if (confirm("Save a snapshot of this project?")) {
+                        // This would create a project snapshot
+                        console.log("Creating snapshot for project:", project.id);
+                      }
                     }}
+                    title="Save Snapshot"
                   >
-                    <i className="fas fa-copy text-xs"></i>
+                    <i className="fas fa-camera text-xs"></i>
                   </button>
                   <button
                     className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-strudel-error"
@@ -179,9 +184,20 @@ export function ProjectsPanel({ currentProjectId, onProjectSelect, onCreateProje
       {/* Project Actions */}
       <div className="p-4 border-t border-strudel-surface-light mt-auto">
         <div className="space-y-2">
-          <button className="w-full px-3 py-2 bg-strudel-surface-light hover:bg-strudel-surface-light/80 text-slate-300 text-sm rounded-lg transition-colors flex items-center">
-            <i className="fas fa-upload mr-2"></i>
-            Import Project
+          <button 
+            onClick={() => {
+              if (currentProjectId) {
+                // Save snapshot of current project
+                const message = prompt("Snapshot description (optional):");
+                console.log("Creating snapshot with message:", message);
+              } else {
+                alert("Please select a project first");
+              }
+            }}
+            className="w-full px-3 py-2 bg-strudel-surface-light hover:bg-strudel-surface-light/80 text-slate-300 text-sm rounded-lg transition-colors flex items-center"
+          >
+            <i className="fas fa-camera mr-2"></i>
+            Save Snapshot
           </button>
           <button className="w-full px-3 py-2 bg-strudel-surface-light hover:bg-strudel-surface-light/80 text-slate-300 text-sm rounded-lg transition-colors flex items-center">
             <i className="fas fa-download mr-2"></i>
