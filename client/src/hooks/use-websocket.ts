@@ -18,9 +18,18 @@ export function useWebSocket(onMessage?: (message: any) => void) {
     }
 
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
+    const host = window.location.host;
     
-    const socket = new WebSocket(wsUrl);
+    // Validate host before creating WebSocket
+    if (!host || host.includes('undefined')) {
+      console.warn('Invalid WebSocket host detected, skipping connection');
+      return;
+    }
+    
+    const wsUrl = `${protocol}//${host}/ws`;
+    
+    try {
+      const socket = new WebSocket(wsUrl);
     socketRef.current = socket;
 
     socket.onopen = () => {
@@ -52,6 +61,9 @@ export function useWebSocket(onMessage?: (message: any) => void) {
     socket.onerror = (error) => {
       console.error("WebSocket error:", error);
     };
+    } catch (error) {
+      console.error("Failed to create WebSocket:", error);
+    }
   }, []);
 
   useEffect(() => {

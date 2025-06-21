@@ -142,8 +142,8 @@ export function AIComposer({ onCodeGenerated, onPlay, isPlaying }: AIComposerPro
           <textarea
             value={compositionPrompt}
             onChange={(e) => setCompositionPrompt(e.target.value)}
-            placeholder="Describe the track you want to create (e.g., 'progressive techno track with evolving bassline and atmospheric pads')"
-            className="w-full h-20 p-2 bg-black/50 border border-purple-700 text-purple-200 placeholder-purple-500 font-mono text-sm resize-none"
+            placeholder="e.g., 'progressive techno with evolving bassline'"
+            className="w-full h-16 p-2 bg-black/50 border border-purple-700 text-purple-200 placeholder-purple-500 font-mono text-xs resize-none"
             disabled={isComposing}
           />
         </div>
@@ -205,25 +205,25 @@ export function AIComposer({ onCodeGenerated, onPlay, isPlaying }: AIComposerPro
         {/* Composition Steps */}
         {compositionSteps.length > 0 && (
           <div className="space-y-2">
-            <div className="text-sm font-mono text-purple-300">
-              COMPOSITION HISTORY:
+            <div className="text-xs font-mono text-purple-300">
+              HISTORY:
             </div>
-            <ScrollArea className="h-32">
-              <div className="space-y-2">
+            <ScrollArea className="h-24">
+              <div className="space-y-1">
                 {compositionSteps.map((step) => (
                   <div
                     key={step.step}
                     className="p-2 bg-purple-900/20 border border-purple-700/30 rounded text-xs font-mono"
                   >
                     <div className="flex justify-between items-center mb-1">
-                      <Badge variant="outline" className="text-purple-400 border-purple-600">
-                        STEP {step.step}
+                      <Badge variant="outline" className="text-purple-400 border-purple-600 text-xs px-1 py-0">
+                        {step.step}
                       </Badge>
-                      <span className="text-purple-500">
+                      <span className="text-purple-500 text-xs">
                         {step.timestamp.toLocaleTimeString()}
                       </span>
                     </div>
-                    <div className="text-purple-200">{step.description}</div>
+                    <div className="text-purple-200 text-xs truncate">{step.description}</div>
                   </div>
                 ))}
               </div>

@@ -20,7 +20,7 @@ export function Sidebar({
   onPlay,
   isPlaying = false
 }: SidebarProps) {
-  const [activeTab, setActiveTab] = useState<"projects" | "chat">("projects");
+  const [activeTab, setActiveTab] = useState<"projects" | "chat" | "composer">("projects");
   const [isStreaming] = useState(true);
 
   return (
