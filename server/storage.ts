@@ -75,9 +75,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateProject(id: number, project: Partial<InsertProject>): Promise<Project | undefined> {
+    const updateData: any = { ...project, updatedAt: new Date() };
     const [updatedProject] = await db
       .update(projects)
-      .set({ ...project, updatedAt: new Date() })
+      .set(updateData)
       .where(eq(projects.id, id))
       .returning();
     return updatedProject || undefined;
@@ -85,7 +86,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteProject(id: number): Promise<boolean> {
     const result = await db.delete(projects).where(eq(projects.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   async getProjectSnapshots(projectId: number): Promise<ProjectSnapshot[]> {

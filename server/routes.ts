@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { insertProjectSchema, insertProjectSnapshotSchema, insertChatMessageSchema } from "@shared/schema";
-import { chatWithAI } from "./openai";
+import { chatWithAI, generateRandomBeat } from "./openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
@@ -190,6 +190,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Auto-saved successfully" });
     } catch (error) {
       res.status(500).json({ message: "Auto-save failed" });
+    }
+  });
+
+  // Generate random beat endpoint
+  app.post("/api/generate/random-beat", async (req, res) => {
+    try {
+      const beat = await generateRandomBeat();
+      res.json({ code: beat });
+    } catch (error) {
+      console.error('Random beat generation error:', error);
+      res.status(500).json({ message: "Failed to generate random beat" });
     }
   });
 

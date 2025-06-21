@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { apiRequest } from "@/lib/queryClient";
 
-export function useAutoSave(projectId: number | null, code: string) {
+export function useAutoSave(projectId: number | null, code: string, enabled: boolean = true) {
   const timeoutRef = useRef<NodeJS.Timeout>();
   const lastSavedCodeRef = useRef<string>("");
 
@@ -11,8 +11,8 @@ export function useAutoSave(projectId: number | null, code: string) {
       clearTimeout(timeoutRef.current);
     }
 
-    // Don't auto-save if no project or code hasn't changed
-    if (!projectId || code === lastSavedCodeRef.current) {
+    // Don't auto-save if disabled, no project, or code hasn't changed
+    if (!enabled || !projectId || code === lastSavedCodeRef.current) {
       return;
     }
 
@@ -32,10 +32,20 @@ export function useAutoSave(projectId: number | null, code: string) {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [projectId, code]);
+  }, [projectId, code, enabled]);
 
   // Update the last saved code when project changes
   useEffect(() => {
     lastSavedCodeRef.current = code;
   }, [projectId]);
+}
+
+export function useAutoSaveToggle() {
+  const [isAutoSaveEnabled, setIsAutoSaveEnabled] = useState(true);
+  
+  const toggleAutoSave = () => {
+    setIsAutoSaveEnabled(prev => !prev);
+  };
+
+  return { isAutoSaveEnabled, toggleAutoSave };
 }

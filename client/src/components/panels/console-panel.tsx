@@ -81,7 +81,7 @@ export function ConsolePanel({ messages }: ConsolePanelProps) {
       {/* Console Input */}
       <div className="p-4 border-t border-strudel-surface-light">
         <div className="flex space-x-2">
-          <span className="strudel-primary font-mono text-sm flex items-center">></span>
+          <span className="strudel-primary font-mono text-sm flex items-center">{'>'}</span>
           <Input
             placeholder="Enter command..."
             className="flex-1 bg-transparent border-none text-slate-200 text-sm font-mono focus:outline-none focus:ring-0 p-0"

@@ -74,6 +74,24 @@ export async function generateStrudelPattern(description: string, bpm: number = 
   }
 }
 
+export async function generateRandomBeat(): Promise<string> {
+  const beatStyles = [
+    "energetic house beat with rolling bassline",
+    "minimal techno with sparse percussion",
+    "funky breakbeat with syncopated rhythms",
+    "ambient downtempo with subtle percussion",
+    "driving four-on-the-floor dance beat",
+    "experimental glitchy rhythm",
+    "classic hip-hop boom bap pattern",
+    "fast-paced drum and bass breakbeat",
+    "relaxed lo-fi hip hop groove",
+    "industrial techno with heavy kicks"
+  ];
+
+  const randomStyle = beatStyles[Math.floor(Math.random() * beatStyles.length)];
+  return generateStrudelPattern(randomStyle, 120);
+}
+
 export async function analyzeStrudelCode(code: string): Promise<{
   suggestions: string[];
   errors: string[];

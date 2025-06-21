@@ -21,15 +21,20 @@ export function TopBar({
   return (
     <div className="h-16 bg-strudel-surface border-b border-strudel-surface-light flex items-center justify-between px-6">
       <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm font-medium text-slate-300">Current Project:</span>
-          <span className="text-sm font-semibold text-slate-100">
-            {currentProject?.name || "No project selected"}
-          </span>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm font-medium text-slate-300">Current Project:</span>
+            <span className="text-sm font-semibold text-slate-100">
+              {currentProject?.name || "No project selected"}
+            </span>
+          </div>
           <div className="flex items-center space-x-1 text-xs">
             <div className="w-2 h-2 bg-strudel-accent rounded-full"></div>
             <span className="strudel-accent">Auto-saved</span>
           </div>
+          <button className="px-3 py-1 bg-strudel-warning hover:bg-strudel-warning/80 text-white text-xs rounded-lg transition-colors">
+            Generate Beat
+          </button>
         </div>
       </div>
 

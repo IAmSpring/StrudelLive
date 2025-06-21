@@ -62,7 +62,7 @@ export function PerformanceControls({
               ? "bg-strudel-primary text-white"
               : "text-slate-400 hover:text-slate-200"
           }`}
-          onClick={() => !isStudioMode || onStudioModeToggle()}
+          onClick={() => !isStudioMode ? null : onStudioModeToggle()}
         >
           Code
         </button>
