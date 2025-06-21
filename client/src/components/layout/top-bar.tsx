@@ -31,7 +31,7 @@ export function TopBar({
           <div className="flex items-center space-x-2">
             <span className="text-sm font-medium text-slate-300">Current Project:</span>
             <span className="text-sm font-semibold text-slate-100">
-              {currentProject?.name || "No project selected"}
+              {currentProject?.name || "Welcome Playground"}
             </span>
           </div>
           <button 

@@ -28,6 +28,11 @@ export default function Studio() {
   const queryClient = useQueryClient();
   const { isAutoSaveEnabled, toggleAutoSave } = useAutoSaveToggle();
 
+  // Fetch projects list
+  const { data: projects = [] } = useQuery({
+    queryKey: ["/api/projects"],
+  });
+
   // Fetch current project
   const { data: currentProject } = useQuery({
     queryKey: ["/api/projects", currentProjectId],
@@ -36,6 +41,13 @@ export default function Studio() {
 
   // Auto-save hook
   useAutoSave(currentProjectId, code, isAutoSaveEnabled);
+
+  // Initialize with random project if no projects exist and no current project
+  useEffect(() => {
+    if (projects.length === 0 && !currentProjectId && !code) {
+      handleGenerateRandomBeat();
+    }
+  }, [projects, currentProjectId, code]);
 
   // Audio engine hook
   const audioEngine = useAudioEngine();
@@ -163,17 +175,36 @@ export default function Studio() {
       const data = await response.json();
       setCode(data.code);
       addConsoleMessage("info", "Random beat generated");
-      toast({
-        title: "Beat Generated",
-        description: "A random beat pattern has been created.",
-      });
+      
+      // Only show toast if user actively clicked the button (not on startup)
+      if (currentProjectId || projects.length > 0) {
+        toast({
+          title: "Beat Generated",
+          description: "A random beat pattern has been created.",
+        });
+      }
     } catch (error) {
-      addConsoleMessage("error", "Failed to generate random beat");
-      toast({
-        title: "Generation Failed",
-        description: "Could not generate random beat. Please try again.",
-        variant: "destructive",
-      });
+      // Fallback to a basic pattern if API fails
+      const fallbackPattern = `// Welcome to Strudel Live Coding!
+// Press Ctrl+Enter to evaluate code, Space to play/pause
+
+stack(
+  "bd ~ ~ ~",
+  "~ ~ sn ~", 
+  "hh hh hh hh"
+).s(0.7)`;
+      
+      setCode(fallbackPattern);
+      addConsoleMessage("info", "Loaded default pattern");
+      
+      if (currentProjectId || projects.length > 0) {
+        addConsoleMessage("error", "Failed to generate random beat");
+        toast({
+          title: "Generation Failed",
+          description: "Could not generate random beat. Loaded default pattern instead.",
+          variant: "destructive",
+        });
+      }
     }
   };
 

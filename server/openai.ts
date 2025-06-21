@@ -77,7 +77,7 @@ export async function generateStrudelPattern(description: string, bpm: number = 
 export async function generateRandomBeat(): Promise<string> {
   const beatStyles = [
     "energetic house beat with rolling bassline",
-    "minimal techno with sparse percussion",
+    "minimal techno with sparse percussion", 
     "funky breakbeat with syncopated rhythms",
     "ambient downtempo with subtle percussion",
     "driving four-on-the-floor dance beat",
@@ -85,11 +85,43 @@ export async function generateRandomBeat(): Promise<string> {
     "classic hip-hop boom bap pattern",
     "fast-paced drum and bass breakbeat",
     "relaxed lo-fi hip hop groove",
-    "industrial techno with heavy kicks"
+    "industrial techno with heavy kicks",
+    "tribal percussion with organic rhythms",
+    "psychedelic trance with building energy",
+    "jazzy swing with improvised fills",
+    "reggaeton with Latin percussion",
+    "UK garage with shuffled hi-hats"
   ];
 
   const randomStyle = beatStyles[Math.floor(Math.random() * beatStyles.length)];
-  return generateStrudelPattern(randomStyle, 120);
+  
+  try {
+    return await generateStrudelPattern(randomStyle, 120);
+  } catch (error) {
+    // Fallback patterns if AI generation fails
+    const fallbackPatterns = [
+      `// ${randomStyle}
+stack(
+  "bd ~ ~ ~",
+  "~ ~ sn ~",
+  "hh hh hh hh"
+).s(0.7)`,
+      `// ${randomStyle}
+stack(
+  "bd bd ~ ~",
+  "~ sn ~ sn",
+  "hh ~ hh ~"
+).s(0.6).lpf(2000)`,
+      `// ${randomStyle}
+stack(
+  "bd ~ sn ~",
+  "hh hh hh hh",
+  "~ cp ~ ~"
+).s(0.8)`
+    ];
+    
+    return fallbackPatterns[Math.floor(Math.random() * fallbackPatterns.length)];
+  }
 }
 
 export async function analyzeStrudelCode(code: string): Promise<{

@@ -173,9 +173,10 @@ export function ProjectsPanel({ currentProjectId, onProjectSelect, onCreateProje
           
           {projects.length === 0 && (
             <div className="text-center py-8">
-              <i className="fas fa-folder-open text-slate-500 text-2xl mb-2"></i>
-              <p className="text-slate-400 text-sm">No projects yet</p>
-              <p className="text-slate-500 text-xs">Create your first project to get started</p>
+              <i className="fas fa-music text-slate-500 text-2xl mb-2"></i>
+              <p className="text-slate-400 text-sm">Welcome to Strudel!</p>
+              <p className="text-slate-500 text-xs mb-3">A random beat is loaded in the editor</p>
+              <p className="text-slate-500 text-xs">Create your first project to save your work</p>
             </div>
           )}
         </div>

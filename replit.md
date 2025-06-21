@@ -86,11 +86,21 @@ The application follows a modern full-stack architecture with clear separation b
 - **Build Command**: `npm run build`
 - **Start Command**: `npm run start`
 
+## Recent Changes
+
+✓ Added auto-save toggle functionality - users can turn auto-save on/off
+✓ Implemented random beat generation with AI-powered pattern creation
+✓ Fixed studio mode toggle to work properly between Code and Studio views
+✓ Added project snapshot functionality for saving code versions
+✓ Enhanced first-time user experience with automatic random beat generation
+✓ Improved fallback patterns when AI generation is unavailable
+
 ## Changelog
 
-Changelog:
-- June 21, 2025. Initial setup
+- June 21, 2025: Initial Strudel live coding platform setup
+- June 21, 2025: Added auto-save toggle, random beat generation, and first-time user onboarding
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Features prioritized: Live performance functionality, AI-assisted pattern generation, user-friendly onboarding.
