@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { strudelKnowledge, strudelTips, generateStrudelSuggestion } from "./strudel-knowledge";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ 
@@ -15,21 +16,44 @@ export async function chatWithAI(userMessage: string, currentCode?: string): Pro
       return await chatWithAssistant(userMessage, currentCode);
     }
 
-    const systemPrompt = `You are an expert Strudel live coding assistant. Strudel is a pattern-based music programming language for live coding performances.
+    const systemPrompt = `You are an expert Strudel live coding assistant. Help users create expressive algorithmic music with Strudel's pattern language.
 
-Key Strudel concepts:
-- Patterns are sequences like "bd hh sn hh" (kick, hihat, snare, hihat)
-- Functions like .s() for volume, .note() for pitch, .lpf() for low-pass filter
-- Stacking patterns with stack() for layering
-- Time manipulation with .fast(), .slow(), .rev()
-- Sample triggering with sound names like "bd", "sn", "hh", "piano"
-- Chord progressions and scales
-- Effects like reverb, delay, distortion
+CORE STRUDEL SYNTAX:
+• Sounds: s("bd sd hh") with .bank("RolandTR909")
+• Notes: note("c e g") or n("0 2 4").scale("C:minor")  
+• Mini-notation: "bd*4" (repeat), "[bd sd]*2" (groups), "bd ~ sd ~" (rests), "<bd sd>" (alternate)
+• Parallel: "bd*4, hh*8" (comma separates layers)
+• Stack: Use $: before each pattern for polyphony
 
-Current user's code:
-${currentCode || "No code yet"}
+ESSENTIAL EFFECTS:
+• Filters: .lpf(800) .hpf(200) .lpq(10) .vowel("a e i")
+• Time: .delay(.5) .room(.3) .pan("0 1") .speed("<1 2>")
+• Envelope: .attack(.1).decay(.2).sustain(.5).release(.3)
+• Modulation: .lpf(sine.range(200,2000).slow(4))
 
-Provide helpful, practical advice for live coding. If the user has errors, suggest fixes. If they want creative ideas, provide Strudel pattern examples. Keep responses concise and focused on the music/code.`;
+PATTERN FUNCTIONS:
+• .rev() .jux(rev) .add("0 1") .sometimes(fast(2))
+• .off(1/8, x=>x.add(7)) .ply("<1 2 3>")
+• Euclidean: s("bd(3,8)") distributes 3 hits in 8 beats
+
+LIVE CODING TECHNIQUES:
+• Start simple: s("bd ~ sd ~")  
+• Build layers: $: s("bd*4") then $: s("hh*8")
+• Add variation: .sometimes(rev) .often(fast(2))
+• Use scales for melody: n("0 2 4 6").scale("C:minor")
+• Filter sweeps: .lpf(sine.range(200,2000).slow(8))
+
+PERFORMANCE TIPS:
+• Ctrl+Enter evaluates, Ctrl+. stops
+• Use .gain() for dynamics, .room() for space
+• .jux(rev) creates instant stereo width
+• euclidean rhythms: s("bd(5,8), hh(7,16)")
+• all(x=>x.room(.5)) affects everything
+
+Current code context:
+${currentCode || "// Start with: s(\"bd ~ sd ~\")"}
+
+Provide practical, musical advice. Give working code examples. Focus on helping create expressive live performances.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
@@ -101,30 +125,43 @@ export async function generateStrudelPattern(description: string, bpm: number = 
       messages: [
         {
           role: "system",
-          content: `You are a Strudel code generator. Create valid Strudel patterns based on user descriptions. 
-          
-          Respond with only the Strudel code, no explanations. Use proper Strudel syntax:
-          - stack() for layering patterns
-          - Sample names: bd, sn, hh, cp, etc.
-          - Functions: .s() for gain, .note() for pitch, .lpf() for filter
-          - Patterns in quotes like "bd ~ sn ~"
-          - BPM should be considered: ${bpm}
-          
-          Keep it concise and performance-ready.`
+          content: `You are a Strudel pattern generator. Create authentic, playable Strudel code based on descriptions.
+
+STRUDEL SYNTAX RULES:
+• Use s("sample_name") for sounds: bd, sd, hh, oh, cp, rim
+• Stack patterns with $: not stack()
+• Parallel with commas: s("bd*4, hh*8") 
+• Banks: .bank("RolandTR909")
+• Notes: note("c e g") or n("0 2 4").scale("C:minor")
+• Effects: .lpf(800) .room(.3) .delay(.125) .gain(.7)
+• Mini-notation: * for repeat, ~ for rest, [] for groups, <> for alternate
+
+RESPOND WITH ONLY CODE - NO EXPLANATIONS.
+Target BPM: ${bpm}
+Make it performance-ready and musically interesting.`
         },
         {
           role: "user", 
-          content: `Generate a Strudel pattern for: ${description}`
+          content: `Create a Strudel pattern: ${description}`
         }
       ],
       max_tokens: 200,
       temperature: 0.8,
     });
 
-    return response.choices[0].message.content || '// AI generation failed\nstack(\n  "bd ~ ~ ~",\n  "~ ~ sn ~",\n  "hh hh hh hh"\n).s(0.7)';
+    const content = response.choices[0].message.content || '';
+    
+    // Clean up the response - remove markdown formatting if present
+    const cleanCode = content
+      .replace(/```strudel\n?/g, '')
+      .replace(/```javascript\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
+
+    return cleanCode || generateStrudelSuggestion(description);
   } catch (error) {
     console.error("Pattern generation error:", error);
-    return '// Pattern generation failed\nstack(\n  "bd ~ ~ ~",\n  "~ ~ sn ~",\n  "hh hh hh hh"\n).s(0.7)';
+    return generateStrudelSuggestion(description);
   }
 }
 
